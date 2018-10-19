@@ -8,11 +8,10 @@ module.exports = {
         ctx.userCollection = ctx.db.collection("users");
         await next();
     },
-    getUser: async (ctx, next) => {
-        ctx.user = await ctx.userCollection.findOne({
-            _id: ObjectId(ctx.session.user)
-        });
-
+    withAuth: async (ctx, next) => {
+        if(!ctx.isAuthenticated()) {
+            ctx.throw(401);
+        }
         await next();
     }
 };

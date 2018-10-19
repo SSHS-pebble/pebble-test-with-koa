@@ -11,10 +11,7 @@ const PORT = 8000;
 
 app.keys = ["pebble-secret-key"];
 
-app.use(session(app)).use(serve(__dirname + "/view/dist")).use(mount("/api", async (ctx, next) => {
-    ctx.body = {};
-    await next();
-})).use(mount("/api", api));
+app.use(serve(__dirname + "/view/dist")).use(session(app)).use(mount("/api", api));
 
 const server = app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
 

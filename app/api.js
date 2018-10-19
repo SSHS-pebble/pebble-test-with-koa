@@ -2,15 +2,16 @@ const Koa = require("koa");
 const koaBody = require("koa-body");
 const passport = require("koa-passport");
 
-require("./route/auth-config.js")(passport);
-const router = require("./route/index.js");
+require("./auth/config.js")(passport);
+const auth = require("./auth/index.js");
+const api = require("./api/index.js");
 const middleware = require("./middleware/index.js");
 
-const api = new Koa();
+const endpoint = new Koa();
 
-api.use(async (ctx, next) => {
+endpoint.use(async (ctx, next) => {
     ctx.body = {};
     await next();
-}).use(koaBody()).use(middleware.getDB).use(middleware.getUser).use(passport.initialize()).use(passport.session()).use(router.routes()).use(router.allowedMethods());
+}).use(koaBody()).use(middleware.getDB).use(passport.initialize()).use(passport.session()).use(auth.routes()).use(auth.allowedMethods()).use(api.routes()).use(api.allowedMethods());
 
-module.exports = api;
+module.exports = endpoint;
