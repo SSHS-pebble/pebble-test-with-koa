@@ -9,7 +9,7 @@ passport.serializeUser(({ ctx }, user, done) => {
 
 passport.deserializeUser(async ({ ctx }, _id, done) => {
     try {
-        const user = await ctx.userCollection.findOne({
+        const user = await ctx.state.collection.users.findOne({
             _id: ObjectId(_id)
         });
         done(null, user);
@@ -23,7 +23,7 @@ passport.use(new LocalStrategy({
     passwordField: "password",
     passReqToCallback: true
 }, async ({ ctx }, username, password, done) => {
-    const user = await ctx.userCollection.findOne({
+    const user = await ctx.state.collection.users.findOne({
         email: ctx.request.body.email
     });
 

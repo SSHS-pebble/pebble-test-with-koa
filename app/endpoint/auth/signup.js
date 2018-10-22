@@ -5,7 +5,7 @@ module.exports = async (ctx, next) => {
         ctx.throw(400);
     }
     try {
-        await ctx.userCollection.insertOne({
+        await ctx.state.collection.users.insertOne({
             email: ctx.request.body.email,
             name: ctx.request.body.name,
             code: ctx.request.body.code,

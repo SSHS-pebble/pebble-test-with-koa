@@ -11,17 +11,17 @@
         "@babel/preset-react": "latest"
     },
     "dependencies": {
+        "bcrypt": "latest",
+        "dotenv": "latest",
         "koa": "latest",
         "koa-body": "latest",
+        "koa-passport": "latest",
         "koa-router": "latest",
         "koa-session": "latest",
         "koa-static": "latest",
-        "koa-mount": "latest",
-        "koa-passport": "latest",
         "passport-local": "latest",
         "mongodb": "latest",
-        "dotenv": "latest",
-        "bcrypt": "latest",
+        "passport-local": "latest",
         "react": "latest",
         "react-dom": "latest"
     }
