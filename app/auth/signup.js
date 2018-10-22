@@ -18,6 +18,6 @@ module.exports = async (ctx, next) => {
         }
         throw e;
     }
-    ctx.body.status = "success";
+
     await next();
 };

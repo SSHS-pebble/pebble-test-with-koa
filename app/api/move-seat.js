@@ -6,18 +6,18 @@ module.exports = {
         await ctx.db.collection("move-seat-state").insertOne({
             user: ctx.state.user._id
         });
-        ctx.body.status = "success";
+
         await next();
     },
     get: async (ctx, next) => {
-        ctx.body = await ctx.db.collection("move-seat-state").find().toArray();
+        ctx.body.data = await ctx.db.collection("move-seat-state").find().toArray();
         await next();
     },
     delete: async (ctx, next) => {
         await ctx.db.collection("move-seat-state").deleteOne({
             user: ctx.state.user._id
         });
-        ctx.body.status = "success";
+
         await next();
     }
 };
