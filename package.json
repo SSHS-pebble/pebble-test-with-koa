@@ -11,15 +11,17 @@
         "@babel/preset-react": "latest"
     },
     "dependencies": {
+        "date-fns": "next",
+        "bcrypt": "latest",
+        "dotenv": "latest",
         "koa": "latest",
         "koa-body": "latest",
+        "koa-passport": "latest",
         "koa-router": "latest",
         "koa-session": "latest",
         "koa-static": "latest",
-        "koa-mount": "latest",
+        "passport-local": "latest",
         "mongodb": "latest",
-        "dotenv": "latest",
-        "bcrypt": "latest",
         "react": "latest",
         "react-dom": "latest"
     }
