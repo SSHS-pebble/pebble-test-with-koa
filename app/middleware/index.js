@@ -7,7 +7,7 @@ module.exports = {
         ctx.state.db = ctx.state.client.db("pebble-db");
         ctx.state.collection = {};
         ctx.state.collection.users = ctx.state.db.collection("users");
-        ctx.state.collection.moveSeatState = ctx.state.db.collection("move-seat-state");
+        ctx.state.collection.moveSeatState = [1, 2, 3].map(index => ctx.state.db.collection("move-seat-state-" + index));
         await next();
     },
     withAuth: async (ctx, next) => {
