@@ -18,5 +18,9 @@ module.exports = {
     }),
     disallowLogin: () => ({
         type: "DISALLOW_LOGIN"
+    }),
+    toggleAccountMenu: event => ({
+        type: "TOGGLE_ACCOUNT_MENU",
+        anchorElement: event.currentTarget
     })
 };

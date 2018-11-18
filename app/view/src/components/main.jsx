@@ -3,14 +3,16 @@ const {
     AppBar,
     Button,
     IconButton,
+    Menu,
+    MenuItem,
     Switch,
     Toolbar,
     Typography,
     withStyles
 } = require("@material-ui/core");
 const {
-    MenuRounded: MenuIcon,
-    AccountCircleRounded: AccountIcon
+    Menu: MenuIcon,
+    AccountCircle: AccountIcon
 } = require("@material-ui/icons");
 const { connect } = require("react-redux");
 
@@ -40,9 +42,13 @@ module.exports = withStyles(styles)(connect(state => state, actions)(props => (
           <Switch onChange={event => props.toggle()} checked={props.toggler.toggled} />
           {props.login.isLoggedIn ?
            <div>
-             <IconButton color="inherit">
+             <IconButton color="inherit" onClick={props.toggleAccountMenu}>
                <AccountIcon />
              </IconButton>
+             <Menu anchorEl={props.accountMenu.anchorElement} open={Boolean(props.accountMenu.anchorElement)} onClose={props.toggleAccountMenu}>
+               <MenuItem>Profile</MenuItem>
+               <MenuItem>Logout</MenuItem>
+             </Menu>
            </div> :
            <Button color="inherit" onClick={props.toggleLoginDialog}>Login</Button>}
         </Toolbar>
