@@ -6,6 +6,7 @@ const passport = require("koa-passport");
 require("./auth/config");
 const auth = require("./auth");
 const api = require("./api");
+const snack = require("./snack");
 const middleware = require("../middleware");
 
 const endpoint = new Router();
@@ -13,5 +14,14 @@ const endpoint = new Router();
 endpoint.use(async (ctx, next) => {
     ctx.body = {};
     await next();
-}).use(koaBody()).use(middleware.getDB).use(passport.initialize()).use(passport.session()).use("/auth", auth.routes(), auth.allowedMethods()).use("/api", api.routes(), api.allowedMethods()).use(ctx => ctx.body.status = "success");
+})
+.use(koaBody())
+.use(middleware.getDB)
+.use(passport.initialize())
+.use(passport.session())
+.use("/auth", auth.routes(), auth.allowedMethods())
+.use("/api", api.routes(), api.allowedMethods())
+.use("/snack", snack.routes(), snack.allowedMethods())
+.use(ctx => ctx.body.status = "success");
+
 module.exports = endpoint;

@@ -10,7 +10,10 @@ const PORT = 8000;
 
 app.keys = ["pebble-secret-key"];
 
-app.use(serve(__dirname + "/view/dist")).use(session(app)).use(endpoint.routes()).use(endpoint.allowedMethods());
+app.use(serve(__dirname + "/view/dist"))
+.use(session(app))
+.use(endpoint.routes())
+.use(endpoint.allowedMethods());
 
 const server = app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
 
