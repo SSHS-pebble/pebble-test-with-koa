@@ -17,6 +17,7 @@ const {
 const { connect } = require("react-redux");
 
 const LoginDialog = require("./login-dialog.jsx");
+const MainDrawer = require("./drawer.jsx");
 
 const actions = require("../redux/actions.js");
 
@@ -31,9 +32,10 @@ const styles = {
 
 module.exports = withStyles(styles)(connect(state => state, actions)(props => (
     <div>
+      <MainDrawer />
       <AppBar position="static">
         <Toolbar>
-          <IconButton color="inherit" className={props.classes.menuButton}>
+          <IconButton color="inherit" className={props.classes.menuButton} onClick={props.toggleDrawer}>
             <MenuIcon />
           </IconButton>
           <Typography variant="title" color="inherit" className={props.classes.mainBarTitle}>

@@ -2,6 +2,13 @@ module.exports = {
     toggle: () => ({
         type: "TOGGLE_SOMETHING"
     }),
+    toggleDrawer: () => ({
+        type: "TOGGLE_DRAWER"
+    }),
+    toggleDrawerItem: itemName => ({
+        type: "TOGGLE_DRAWER_ITEM",
+        name: "is" + itemName + "Open"
+    }),
     toggleLoginDialog: () => ({
         type: "TOGGLE_LOGIN_DIALOG"
     }),
