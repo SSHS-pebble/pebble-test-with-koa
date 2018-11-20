@@ -27,10 +27,11 @@
         "koa-static": "latest",
         "mongodb": "latest",
         "passport-local": "latest",
-        "react": "next",
+        "react": "latest",
         "react-block-ui": "latest",
-        "react-dom": "next",
+        "react-dom": "latest",
         "react-redux": "latest",
+        "react-router-dom": "latest",
         "redux": "latest",
         "typeface-roboto": "latest"
     }
