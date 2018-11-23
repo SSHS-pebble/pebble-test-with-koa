@@ -12,6 +12,7 @@ const {
     CompareArrows: MoveSeatIcon,
     ExpandLess: ExpandLessIcon,
     ExpandMore: ExpandMoreIcon,
+    Restaurant: MealIcon,
     School: SchoolIcon
 } = require("@material-ui/icons");
 const { Link } = require("react-router-dom");
@@ -48,6 +49,14 @@ const DrawerSublist = props => (
 module.exports = withStyles(styles)(connect(state => state, actions)(props => (
     <Drawer open={props.drawer.isDrawerOpen} onClose={props.toggleDrawer}>
       <List component="nav" className={props.classes.drawer}>
+        <li>
+          <ListItem button component={Link} to="/meal">
+            <ListItemIcon>
+              <MealIcon />
+            </ListItemIcon>
+            <ListItemText>학교 급식</ListItemText>
+          </ListItem>
+        </li>
         <DrawerSublist onToggle={e => props.toggleDrawerItem("Notice")} title="공지사항" icon={<SchoolIcon />} subItem={[{ name: "연구", to: "/notice/research" },{ name: "행사", to: "/notice/event" }, { name: "학사일정", to: "/notice/calendar"}]} isOpen={props.drawer.isNoticeOpen}>
           {item => (
               <li>
