@@ -17,10 +17,10 @@ const {
 } = require("@material-ui/icons");
 const { connect } = require("react-redux");
 
-const LoginDialog = require("./login-dialog.jsx");
+const LoginDialog = require("../../auth/components/login-dialog.jsx");
 const MainDrawer = require("./drawer.jsx");
 
-const actions = require("../redux/actions.js");
+const actions = { ...require("../actions.js"), ...require("../../auth/actions.js") };
 
 const styles = theme => ({
     menuButton: {
@@ -39,7 +39,7 @@ const styles = theme => ({
     }
 });
 
-module.exports = withStyles(styles)(connect(state => state, actions)(props => (
+module.exports = withStyles(styles)(connect(state => ({ main: state.main, auth: state.auth }), actions)(props => (
     <div>
       <MainDrawer />
       <AppBar position="static">
@@ -50,13 +50,12 @@ module.exports = withStyles(styles)(connect(state => state, actions)(props => (
           <Typography variant="title" color="inherit" className={props.classes.mainBarTitle}>
             Dashboard
           </Typography>
-          <Switch onChange={event => props.toggle()} checked={props.toggler.toggled} />
-          {props.login.isLoggedIn ?
+          {props.auth.isLoggedIn ?
            <div>
-             <IconButton color="inherit" onClick={props.toggleAccountMenu}>
+             <IconButton color="inherit" onClick={event => props.toggleAccountMenu(event.target)}>
                <AccountIcon />
              </IconButton>
-             <Menu anchorEl={props.accountMenu.anchorElement} open={Boolean(props.accountMenu.anchorElement)} onClose={props.toggleAccountMenu}>
+             <Menu anchorEl={props.main.anchorElement} open={Boolean(props.main.anchorElement)} onClose={props.toggleAccountMenu}>
                <MenuItem>Profile</MenuItem>
                <MenuItem>Logout</MenuItem>
              </Menu>

@@ -24,17 +24,17 @@ const styles = {
     }
 };
 
-const actions = require("../redux/actions.js");
+const actions = require("../actions.js");
 
-module.exports = withStyles(styles)(connect(state => state, actions)(props => (
+module.exports = withStyles(styles)(connect(state => ({ auth: state.auth }), actions)(props => (
     <div>
-      <Dialog open={props.login.isLoginDialogOpen} onClose={props.toggleLoginDialog}>
+      <Dialog open={props.auth.isLoginDialogOpen} onClose={props.toggleLoginDialog}>
         <form>
           <DialogTitle>Login</DialogTitle>
           <DialogContent>
             <ReduxBlockUi block="BLOCK_LOGIN_DIALOG" unblock={["ALLOW_LOGIN", "DISALLOW_LOGIN"]} loader={<CircularProgress />} className={props.classes.dialogContent}>
-              <TextField className={props.classes.textField} autoFocus type="email" margin="normal" placeholder="Email" onChange={event => props.inputToLoginDialog("emailText", event.target.value)} value={props.login.emailText} />
-              <TextField className={props.classes.textField} type="password" margin="normal" placeholder="Password" onChange={event => props.inputToLoginDialog("passwordText", event.target.value)} value={props.login.passwordText} />
+              <TextField className={props.classes.textField} autoFocus type="email" margin="normal" placeholder="Email" onChange={event => props.inputToLoginDialog("emailText", event.target.value)} value={props.auth.emailText} />
+              <TextField className={props.classes.textField} type="password" margin="normal" placeholder="Password" onChange={event => props.inputToLoginDialog("passwordText", event.target.value)} value={props.auth.passwordText} />
             </ReduxBlockUi>
           </DialogContent>
           <DialogActions>
@@ -42,8 +42,8 @@ module.exports = withStyles(styles)(connect(state => state, actions)(props => (
             <Button color="primary" onClick={event => {
                 props.blockLoginDialog();
                 axios.post("/auth/login", {
-                    email: props.login.emailText,
-                    password: props.login.passwordText
+                    email: props.auth.emailText,
+                    password: props.auth.passwordText
                 }).then(response => props.allowLogin()).catch(error => props.disallowLogin());
             }}>Login</Button>
           </DialogActions>
