@@ -5,6 +5,7 @@ const {
     IconButton,
     Menu,
     MenuItem,
+    Paper,
     Switch,
     Toolbar,
     Typography,
@@ -21,14 +22,22 @@ const MainDrawer = require("./drawer.jsx");
 
 const actions = require("../redux/actions.js");
 
-const styles = {
+const styles = theme => ({
     menuButton: {
         margin: [[0, 12, 0, -12]]
     },
     mainBarTitle: {
         flexGrow: 1
+    },
+    mainDocument: {
+        ...theme.mixins.gutters(),
+        paddingTop: theme.spacing.unit * 2,
+        paddingBottom: theme.spacing.unit * 2,
+        maxWidth: 760,
+        margin: [[theme.spacing.unit * 3, "auto", theme.spacing.unit * 3, "auto"]],
+        minHeight: 800
     }
-};
+});
 
 module.exports = withStyles(styles)(connect(state => state, actions)(props => (
     <div>
@@ -56,5 +65,10 @@ module.exports = withStyles(styles)(connect(state => state, actions)(props => (
         </Toolbar>
       </AppBar>
       <LoginDialog />
+      <Paper elevation={1} className={props.classes.mainDocument}>
+        <Typography variant="title">
+          This is the title of the document.
+        </Typography>
+      </Paper>
     </div>
 )));
