@@ -1,4 +1,10 @@
-require("dotenv").config();
+const dotenv = require("dotenv");
+const path = require("path");
+
+dotenv.config({
+    path: path.join(__dirname, "../.env")
+});
+
 const Koa = require("koa");
 const serve = require("koa-static");
 const session = require("koa-session");
