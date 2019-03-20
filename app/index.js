@@ -6,7 +6,7 @@ const session = require("koa-session");
 const endpoint = require("./endpoint");
 
 const app = new Koa();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 app.keys = ["pebble-secret-key"];
 
