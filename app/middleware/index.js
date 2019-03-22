@@ -1,8 +1,10 @@
-const { MongoClient, ObjectId } = require("mongodb");
+const { MongoClient } = require("mongodb");
 
 module.exports = {
     getDB: async (ctx, next) => {
-        const url = `mongodb://${process.env.PEBBLE_DB_USER}:${process.env.PEBBLE_DB_PW}@ds235243.mlab.com:35243/pebble-db`;
+        const url = `mongodb://${process.env.PEBBLE_DB_USER}:${
+            process.env.PEBBLE_DB_PW
+        }@ds235243.mlab.com:35243/pebble-db`;
         ctx.state.client = await MongoClient.connect(url);
         ctx.state.db = ctx.state.client.db("pebble-db");
         ctx.state.collection = {};

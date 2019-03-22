@@ -1,34 +1,35 @@
 # Pebble Test using koa
+
 ## Initial setup
 
-Clone this repository: 
+Clone this repository:
 
-``` shell
+```shell
 git clone https://github.com/SSHS-pebble/pebble-test-with-koa.git
 cd pebble-test-with-koa
 ```
 
 and install all dependencies:
 
-``` shell
+```shell
 npm i
 ```
 
-To bundle, install parcel: 
+To bundle, install parcel:
 
-``` shell
+```shell
 npm i -g parcel
 ```
 
 Bundle:
 
-``` shell
+```shell
 npm run build
 ```
 
 and start server:
 
-``` shell
+```shell
 node ./app/index.js
 ```
 
@@ -36,7 +37,7 @@ node ./app/index.js
 
 You need an env file in the `./` directory. The format is:
 
-``` shell
+```shell
 PEBBLE_DB_USER="pebble-db-user"
 PEBBLE_DB_PW="pebble-db-pw"
 ```
@@ -44,15 +45,15 @@ PEBBLE_DB_PW="pebble-db-pw"
 ### Frontend
 
 The frontend directory is `/app/view`. Parcel bundling with babel is configured to output files in `app/view/dist`.
-Bundling while developing: 
+Bundling while developing:
 
-``` shell
+```shell
 npm run dev-build
 ```
 
 Building when deploying:
 
-``` shell
+```shell
 npm run build
 ```
 
@@ -68,4 +69,3 @@ All endpoints that provides or modifies data in server is in `/app/endpoint/api`
 The app from `/app/view` is a SPA and dynamically reloads data by requesting from endpoints, mounted on `/api` or `/auth`, depending on the endpoints.
 
 A directory `/test` will be made in the future for testing purposes.
-

@@ -3,7 +3,7 @@ const { ObjectId } = require("mongodb");
 const passport = require("koa-passport");
 const LocalStrategy = require("passport-local").Strategy;
 
-passport.serializeUser(({ ctx }, user, done) => {
+passport.serializeUser((req, user, done) => {
     done(null, user._id);
 });
 
@@ -27,7 +27,8 @@ passport.use(new LocalStrategy({
         email: ctx.request.body.email
     });
 
-    if(!user || !await bcrypt.compare(ctx.request.body.password, user.password)) {
+    if(!user ||
+       !(await bcrypt.compare(ctx.request.body.password, user.password))) {
         done(null, false);
     }
 
