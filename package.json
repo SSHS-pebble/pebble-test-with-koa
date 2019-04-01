@@ -4,6 +4,8 @@
     "scripts": {
         "dev-build": "parcel watch app/view/index.html -d app/view/dist",
         "build": "parcel build app/view/index.html -d app/view/dist --experimental-scope-hoisting"
+        "eslint:check": "eslint \"**/*.js\"",
+        "eslint:fix": "eslint \"**/*.js\" --fix"
     },
     "devDependencies": {},
     "dependencies": {
