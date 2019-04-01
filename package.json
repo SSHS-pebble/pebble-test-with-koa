@@ -2,8 +2,8 @@
     "name": "pebble-test-koa",
     "main": "app/index.js",
     "scripts": {
-        "dev-build": "parcel watch app/view/index.html -d app/view/dist",
-        "build": "parcel build app/view/index.html -d app/view/dist --experimental-scope-hoisting"
+        "parcel:watch": "parcel watch app/view/index.html -d app/view/dist",
+        "parcel:build": "parcel build app/view/index.html -d app/view/dist --experimental-scope-hoisting",
         "eslint:check": "eslint \"**/*.js\"",
         "eslint:fix": "eslint \"**/*.js\" --fix"
     },
