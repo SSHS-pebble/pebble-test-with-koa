@@ -19,6 +19,7 @@
         "koa-session": "latest",
         "koa-static": "latest",
         "mongodb": "latest",
-        "passport-local": "latest"
+        "passport-local": "latest",
+        "pino": "latest"
     }
 }
