@@ -3,7 +3,7 @@ const { isSameDay } = require("date-fns");
 
 module.exports = {
     post: async (ctx, next) => {
-        if(ctx.state.user.grade != ctx.params.grade) { ctx.throw(403); }
+        if(ctx.state.user.grade !== ctx.params.grade) { ctx.throw(403); }
         await ctx.state.collection.moveSeatState[ctx.params.grade - 1]
             .findOneAndUpdate({ "user.email": ctx.state.user.email }, {
                 $setOnInsert: {

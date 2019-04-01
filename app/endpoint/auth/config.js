@@ -28,7 +28,7 @@ passport.use(new LocalStrategy({
     });
 
     if(!user ||
-       !(await bcrypt.compare(ctx.request.body.password, user.password))) {
+       !await bcrypt.compare(ctx.request.body.password, user.password)) {
         done(null, false);
     }
 

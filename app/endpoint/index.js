@@ -20,5 +20,5 @@ endpoint
     .use(passport.session())
     .use("/auth", auth.routes(), auth.allowedMethods())
     .use("/api", api.routes(), api.allowedMethods())
-    .use(ctx => (ctx.body.status = "success"));
+    .use(ctx => { ctx.body.status = "success"; });
 module.exports = endpoint;

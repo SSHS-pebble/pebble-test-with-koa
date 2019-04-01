@@ -4,8 +4,8 @@ module.exports = async (ctx, next) => {
     if(!ctx.request.body.email ||
        !ctx.request.body.name ||
        !ctx.request.body.code ||
-       1 > parseInt(ctx.request.body.grade) ||
-       3 < parseInt(ctx.request.body.grade) ||
+       parseInt(ctx.request.body.grade) < 1 ||
+       parseInt(ctx.request.body.grade) > 3 ||
        !ctx.request.body.password) {
         ctx.throw(400);
     }
