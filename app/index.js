@@ -17,7 +17,6 @@ const PORT = process.env.PORT || 8000;
 
 app.keys = ["pebble-secret-key"];
 
-app.use(serve(__dirname + "/view/dist"))
 app.use(async (ctx, next) => {
     ctx.state.logger = logger;
     logger.info(ctx.method, ctx.url);
