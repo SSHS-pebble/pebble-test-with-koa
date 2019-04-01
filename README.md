@@ -24,7 +24,7 @@ npm i -g parcel
 Bundle:
 
 ```shell
-npm run build
+npm run parcel:build
 ```
 
 and start server:
@@ -48,13 +48,13 @@ The frontend directory is `/app/view`. Parcel bundling with babel is configured 
 Bundling while developing:
 
 ```shell
-npm run dev-build
+npm run parcel:watch
 ```
 
 Building when deploying:
 
 ```shell
-npm run build
+npm run parcel:build
 ```
 
 ### Backend
