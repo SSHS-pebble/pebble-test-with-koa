@@ -1,71 +1,43 @@
 # Pebble Test using koa
+## Prerequisites
+
+Make sure you installed [Node.js](https://nodejs.org/) and [npm](https://npmjs.com).
+When using windows, install unix tools and git bash from [git](https://git-scm.com/download/win).
+
 ## Initial setup
 
-Clone this repository: 
+Clone this repository and install all dependencies: 
 
 ``` shell
-git clone https://github.com/SSHS-pebble/pebble-test-with-koa.git
-cd pebble-test-with-koa
+$ git clone https://github.com/SSHS-pebble/pebble-test-with-koa.git
+$ cd pebble-test-with-koa
+$ npm i
 ```
 
-and install all dependencies:
+Bundle all frontend assets with [parcel](https://parceljs.org):
 
 ``` shell
-npm i
+$ # If you don't have parcel installed:
+$ npm i -g parcel
+$ npm run build
 ```
 
-To bundle, install parcel: 
+You need an env file for features that use the database.
+Make a database account first and make a `.env` file with credentials.
 
 ``` shell
-npm i -g parcel
+$ touch .env
+$ cat <<EOF > .env
+PEBBLE_DB_USER="your-db-username"
+PEBBLE_DB_PW="your-db-password"
+EOF
 ```
 
-Bundle:
+Start the server:
 
 ``` shell
-npm run build
-```
-
-and start server:
-
-``` shell
-node ./app/index.js
+$ node ./app/index.js
 ```
 
 [The app](http://localhost:8000) runs on port 8000 on localhost.
-
-You need an env file in the `./` directory. The format is:
-
-``` shell
-PEBBLE_DB_USER="pebble-db-user"
-PEBBLE_DB_PW="pebble-db-pw"
-```
-
-### Frontend
-
-The frontend directory is `/app/view`. Parcel bundling with babel is configured to output files in `app/view/dist`.
-Bundling while developing: 
-
-``` shell
-npm run dev-build
-```
-
-Building when deploying:
-
-``` shell
-npm run build
-```
-
-### Backend
-
-The backend directory is `/app/endpoint/api`, `/app/endpoint/auth`, and `/app/middleware`(Basically `/app` except for `/app/view`).
-All endpoints that provides or modifies data in server is in `/app/endpoint/api`, and auth-related are inside `/app/endpoint/auth`.
-`/app/middleware` are for koa middlewares that are needed for majority of routes.
-
-## Project setup
-
-`/app` is the app's main directory. `/app/endpoint` is the app's API routes. `/app/view` is the app's main page.
-The app from `/app/view` is a SPA and dynamically reloads data by requesting from endpoints, mounted on `/api` or `/auth`, depending on the endpoints.
-
-A directory `/test` will be made in the future for testing purposes.
 
