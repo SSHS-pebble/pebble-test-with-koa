@@ -1,6 +1,5 @@
 require("dotenv").config();
 const Koa = require("koa");
-const serve = require("koa-static");
 const session = require("koa-session");
 
 const endpoint = require("./endpoint");
@@ -10,7 +9,7 @@ const PORT = 8000;
 
 app.keys = ["pebble-secret-key"];
 
-app.use(serve(__dirname + "/view/dist")).use(session(app)).use(endpoint.routes()).use(endpoint.allowedMethods());
+app.use(session(app)).use(endpoint.routes()).use(endpoint.allowedMethods());
 
 const server = app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
 
