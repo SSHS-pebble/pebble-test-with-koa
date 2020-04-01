@@ -1,4 +1,7 @@
 const Router = require("koa-router");
+const moveseat = require('./move-seat');
+const classes = require('./classes');
 const api = new Router();
-
-module.exports = api.use("/move-seat/:grade", require("./move-seat.js").common).get("/move-seat/:grade", require("./move-seat.js").get).post("/move-seat/:grade", require("./move-seat.js").post).delete("/move-seat/:grade", require("./move-seat.js").delete);
+api.use("/move-seat/:code", moveseat.common).get("/move-seat/:code", moveseat.get).post("/move-seat/:code", moveseat.post).delete("/move-seat/:code", moveseat.delete);
+api.use("/classes/:code", classes.common).get("/classes/:code", classes.get).post("/classes/:code", classes.post).delete("/classes/:code", classes.delete);
+module.exports = api;
