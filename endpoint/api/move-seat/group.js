@@ -4,7 +4,7 @@ const isNumber = require('is-number');
 
 module.exports = {
     post: async (ctx, next) => {
-        const classCode = parseInt(ctx.params.code, 10);
+        const classCode = parseInt(ctx.request.body.classCode, 10);
         const classInfo = await ctx.state.collection.classes.findOne({ code: classCode });
         if(((1 << (ctx.state.user.grade-1)) & classInfo.moveseat.group) == 0) ctx.throw(400);
         const count = await ctx.state.collection.moveSeatState.countDocuments({ classcode: classCode });
@@ -37,7 +37,7 @@ module.exports = {
         await next();
     },
     get: async (ctx, next) => {
-        ctx.body.data = await ctx.state.collection.moveSeatState.find({ classcode: parseInt(ctx.params.code, 10) }).toArray();
+        ctx.body.data = await ctx.state.collection.moveSeatState.find().toArray();
         await next();
     },
     delete: async (ctx, next) => {
@@ -55,7 +55,7 @@ module.exports = {
             moveSeatInfo.secondary.splice(userIndex, 1);
         } else if(ctx.request.body.operation == 1) {
             if(userIndex == -1) {
-                const classInfo = await ctx.state.collection.classes.findOne({ code: parseInt(ctx.params.code, 10) });
+                const classInfo = await ctx.state.collection.classes.findOne({ code: parseInt(ctx.request.body.classCode, 10) });
                 if(!classInfo || moveSeatInfo.secondary.length+2 > classInfo.moveseat.limit) ctx.throw(400);
                 const addUserInfo = await ctx.state.collection.users.findOne({ code: parseInt(ctx.request.body.userInfo, 10)});
                 if(!addUserInfo) ctx.throw(400);
@@ -69,7 +69,7 @@ module.exports = {
         await next();
     },
     common: async (ctx, next) => {
-        if(!isNumber(ctx.params.code) || ctx.params.code <= 0) ctx.throw(400);
+        if(!isNumber(ctx.request.body.classCode) || ctx.request.body.classCode <= 0) ctx.throw(400);
         if(!ctx.state.user) ctx.throw(400);
 
         ctx.state.collection.moveSeatState = ctx.state.db.collection(`move-seat-group`);
