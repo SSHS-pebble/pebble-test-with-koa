@@ -16,11 +16,7 @@ module.exports = async (ctx, next) => {
             number: parseInt(ctx.request.body.number, 10),
             phone: ctx.request.body.phone,
             password: await bcrypt.hash(ctx.request.body.password, 10),
-            moveSeatInfo: {
-                date: new Date(),
-                classCode: 0,
-                type: "individual"
-            }
+            moveSeatInfo: undefined
         }
     }, { upsert: true });
 

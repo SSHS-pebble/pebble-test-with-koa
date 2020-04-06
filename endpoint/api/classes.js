@@ -2,27 +2,31 @@ const isNumber = require('is-number');
 
 module.exports = {
     post: async (ctx, next) => {
-        if(!ctx.request.body.name || !ctx.request.body.department || !ctx.request.body.type || !ctx.request.body.building) ctx.throw(400);
-        if(!isNumber(ctx.request.body.limit) || !isNumber(ctx.request.body.floor) || !isNumber(ctx.request.body.individual) || !isNumber(ctx.request.body.group)) ctx.throw(401);
-        if(ctx.request.body.limit <= 0 || ctx.request.body.floor <= 0 || ctx.request.body.individual >= 8 || ctx.request.body.individual < 0 || ctx.request.body.group >= 8 || ctx.request.body.group < 0) ctx.throw(401);
-        
-        const classes = await ctx.state.collection.classes.find({}).toArray()
-        var classcode;
-        if(classes.length == 0) classcode = 1;
-        else classcode = classes.map(aclass => aclass.code).sort((a, b) => b - a)[0]+1;
-        if(!isNumber(classcode)) ctx.throw(500);
+        if(!ctx.request.body.name || !ctx.request.body.department || !ctx.request.body.building || !ctx.request.body.individual || !ctx.request.body.group) ctx.throw(400);
+        if(!isNumber(ctx.request.body.limit) || !isNumber(ctx.request.body.floor)) ctx.throw(400);
+        if(ctx.request.body.limit <= 0 || ctx.request.body.floor <= 0) ctx.throw(400);
+        const individualArray = JSON.parse(ctx.request.body.individual);
+        const groupArray = JSON.parse(ctx.request.body.group);
+        if(!Array.isArray(individualArray) || !Array.isArray(groupArray)) ctx.throw(400);
+        individualArray.forEach(allow => { if(allow < 0 || allow > 1) ctx.throw(400); })
+        groupArray.forEach(allow => { if(allow < 0 || allow > 1) ctx.throw(400); })
 
-        await ctx.state.collection.classes.findOneAndUpdate({ name: ctx.request.body.name }, {
+        const classes = await ctx.state.collection.classes.find().toArray()
+        var classCode = undefined;
+        if(classes.length == 0) classCode = 1;
+        else classCode = classes.map(classInfo => classInfo.code).sort((a, b) => b - a)[0]+1;
+        if(!isNumber(classCode)) ctx.throw(500);
+        
+        await ctx.state.collection.classes.findOneAndUpdate({ code: classCode }, {
             $setOnInsert: {
-                code: classcode,
+                name: ctx.request.body.name,
                 department: ctx.request.body.department,
-                type: ctx.request.body.type,
                 building: ctx.request.body.building,
                 floor: parseInt(ctx.request.body.floor, 10),
                 moveseat: {
                     limit: parseInt(ctx.request.body.limit, 10),
-                    individual: parseInt(ctx.request.body.individual, 10),
-                    group: parseInt(ctx.request.body.group, 10)
+                    individual: individualArray,
+                    group: groupArray
                 }
             }
         }, { upsert: true });
@@ -33,8 +37,8 @@ module.exports = {
         await next();
     },
     delete: async (ctx, next) => {
-        if(!isNumber(ctx.request.params.code)) ctx.throw(400);
-        await ctx.state.collection.classes.deleteOne({ name: ctx.request.params.code });
+        if(!isNumber(ctx.request.body.code)) ctx.throw(400);
+        await ctx.state.collection.classes.deleteOne({ code: ctx.request.params.code });
         await next();
     },
     common: async (ctx, next) => {

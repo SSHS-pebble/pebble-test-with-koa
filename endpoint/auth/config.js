@@ -20,12 +20,13 @@ passport.deserializeUser(async ({ ctx }, _id, done) => {
 });
 
 passport.use(new LocalStrategy({
+    // TODO
+    // usernameField: "code",
     usernameField: "email",
     passwordField: "password",
     passReqToCallback: true
 }, async ({ ctx }, username, password, done) => {
     if(!isNumber(username)) done(null, false);
-
     const user = await ctx.state.collection.users.findOne({ code: parseInt(username, 10) });
     
     if(!user || !await bcrypt.compare(password, user.password)) {
