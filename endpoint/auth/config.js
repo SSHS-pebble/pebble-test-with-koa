@@ -20,15 +20,15 @@ passport.deserializeUser(async ({ ctx }, _id, done) => {
 });
 
 passport.use(new LocalStrategy({
-    usernameField: "code",
+    usernameField: "email",
     passwordField: "password",
     passReqToCallback: true
 }, async ({ ctx }, username, password, done) => {
-    if(!isNumber(ctx.request.body.code)) done(null, false);
+    if(!isNumber(username)) done(null, false);
 
-    const user = await ctx.state.collection.users.findOne({ code: parseInt(ctx.request.body.code, 10) });
+    const user = await ctx.state.collection.users.findOne({ code: parseInt(username, 10) });
     
-    if(!user || !await bcrypt.compare(ctx.request.body.password, user.password)) {
+    if(!user || !await bcrypt.compare(password, user.password)) {
         done(null, false);
     }
 
