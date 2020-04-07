@@ -21,6 +21,8 @@ module.exports = {
         await next();
     },
     delete: async (ctx, next) => {
+        const moveSeatInfo = await ctx.state.collection.moveSeatState.findOne({ code: ctx.state.user.code });
+        if(!moveSeatInfo) ctx.throw(400);
         await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: { moveSeatInfo: undefined } });
         await ctx.state.collection.moveSeatState.deleteOne({ code: ctx.state.user.code });
         await next();
