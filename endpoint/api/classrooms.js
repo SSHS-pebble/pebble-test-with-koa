@@ -12,13 +12,13 @@ module.exports = {
         individualArray.forEach(allow => { if(allow < 0 || allow > 1) ctx.throw(400); })
         groupArray.forEach(allow => { if(allow < 0 || allow > 1) ctx.throw(400); })
 
-        const classes = await ctx.state.collection.classes.find().toArray();
-        var classCode = undefined;
-        if(classes.length == 0) classCode = 1;
-        else classCode = classes.map(classInfo => classInfo.code).sort((a, b) => b - a)[0]+1;
-        if(!isNumber(classCode)) ctx.throw(500);
+        const classrooms = await ctx.state.collection.classrooms.find().toArray();
+        var classroomCode = undefined;
+        if(classrooms.length == 0) classroomCode = 1;
+        else classroomCode = classrooms.map(classInfo => classInfo.code).sort((a, b) => b - a)[0]+1;
+        if(!isNumber(classroomCode)) ctx.throw(500);
 
-        await ctx.state.collection.classes.findOneAndUpdate({ code: classCode }, {
+        await ctx.state.collection.classrooms.findOneAndUpdate({ code: classroomCode }, {
             $setOnInsert: {
                 name: ctx.request.body.name,
                 building: ctx.request.body.building,
@@ -33,17 +33,17 @@ module.exports = {
         await next();
     },
     getMany: async (ctx, next) => {
-        ctx.body.data = await ctx.state.collection.classes.find().toArray();
+        ctx.body.data = await ctx.state.collection.classrooms.find().toArray();
         await next();
     },
     getOne: async(ctx, next) => {
         if(!isNumber(ctx.request.params.code)) ctx.throw(400);
-        ctx.body.data = await ctx.state.collection.classes.findOne({ code: parseInt(ctx.request.params.code, 10) });
+        ctx.body.data = await ctx.state.collection.classrooms.findOne({ code: parseInt(ctx.request.params.code, 10) });
         await next();
     },
     deleteOne: async (ctx, next) => {
         if(!isNumber(ctx.request.params.code)) ctx.throw(400);
-        await ctx.state.collection.classes.deleteOne({ code: parseInt(ctx.request.params.code, 10) });
+        await ctx.state.collection.classrooms.deleteOne({ code: parseInt(ctx.request.params.code, 10) });
         await next();
     }
 }

@@ -5,7 +5,7 @@ module.exports = {
         if(!ctx.request.body.name || !ctx.request.body.department) ctx.throw(400);
         if(!isNumber(ctx.request.body.office)) ctx.throw(400);
         
-        const office = await ctx.state.collection.classes.findOne({ code: parseInt(ctx.request.body.office, 10) });
+        const office = await ctx.state.collection.classrooms.findOne({ code: parseInt(ctx.request.body.office, 10) });
         if(!office) ctx.throw(400);
 
         const teachers = await ctx.state.collection.teachers.find().toArray();
@@ -39,7 +39,7 @@ module.exports = {
     },
     putOne: async (ctx, next) => {
         if(!isNumber(ctx.request.body.office) || !isNumber(ctx.request.params.code)) ctx.throw(400);
-        const office = await ctx.state.collection.classes.findOne({ code: parseInt(ctx.request.body.office, 10) });
+        const office = await ctx.state.collection.classrooms.findOne({ code: parseInt(ctx.request.body.office, 10) });
         if(!office) ctx.throw(400);
 
         await ctx.state.collection.teachers.findOneAndUpdate({ code: parseInt(ctx.request.params.code, 10) }, { $set: { office: office._id } });

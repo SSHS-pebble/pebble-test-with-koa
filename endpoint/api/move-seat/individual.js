@@ -4,12 +4,12 @@ const isNumber = require('is-number');
 
 module.exports = {
     post: async (ctx, next) => {
-        const classInfo = await ctx.state.collection.classes.findOne({ code: parseInt(ctx.params.code, 10) });
-        if(!classInfo) ctx.throw(400);
+        const classroomCode = await ctx.state.collection.classrooms.findOne({ code: parseInt(ctx.params.code, 10) });
+        if(!classroomCode) ctx.throw(400);
         const count = await ctx.state.collection.moveSeatState.countDocuments();
-        if(count >= classInfo.moveseat.limit) ctx.throw(400);
+        if(count >= classroomCode.moveseat.limit) ctx.throw(400);
         if(ctx.state.user.moveSeatInfo && isSameDay(new ObjectId(ctx.state.user.moveSeatInfo).getTimestamp(), new Date())) ctx.throw(400);
-        if(!classInfo.moveseat.individual[ctx.state.user.grade-1]) ctx.throw(400);
+        if(!classroomCode.moveseat.individual[ctx.state.user.grade-1]) ctx.throw(400);
 
         await ctx.state.collection.moveSeatState.findOneAndUpdate({ code: ctx.state.user.code }, { $setOnInsert: { classCode: parseInt(ctx.params.code, 10) } }, { upsert: true });
         const insertDoc = await ctx.state.collection.moveSeatState.findOne({ code: ctx.state.user.code });

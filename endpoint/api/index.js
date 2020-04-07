@@ -1,12 +1,12 @@
 const Router = require("koa-router");
 const moveseat = require('./move-seat');
-const classes = require('./classes');
+const classrooms = require('./classrooms');
 const subjects = require('./subjects');
 const teachers = require('./teachers');
 const api = new Router();
 
-api.get("/classes", classes.getMany).post("/classes", classes.post);
-api.get("/classes/:code", classes.getOne).delete("/classes/:code", classes.deleteOne);
+api.get("/classrooms", classrooms.getMany).post("/classrooms", classrooms.post);
+api.get("/classrooms/:code", classrooms.getOne).delete("/classrooms/:code", classrooms.deleteOne);
 
 api.get("/teachers", teachers.getMany).post("/teachers", teachers.post);
 api.get("/teachers/:code", teachers.getOne).delete("/teachers/:code", teachers.deleteOne).put("/teachers/:code", teachers.putOne);

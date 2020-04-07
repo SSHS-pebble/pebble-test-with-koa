@@ -6,7 +6,7 @@ module.exports = {
     post: async (ctx, next) => {
         if(!isNumber(ctx.request.body.classCode) || ctx.request.body.classCode < 1) ctx.throw(400);
         const classCode = parseInt(ctx.request.body.classCode, 10);
-        const classInfo = await ctx.state.collection.classes.findOne({ code: classCode });
+        const classInfo = await ctx.state.collection.classrooms.findOne({ code: classCode });
         if(!classInfo || !classInfo.moveseat.group[ctx.state.user.grade-1]) ctx.throw(400);
         const count = await ctx.state.collection.moveSeatState.countDocuments({ classcode: classCode });
         
@@ -66,7 +66,7 @@ module.exports = {
             moveSeatInfo.secondary.splice(userIndex, 1);
         } else if(ctx.request.body.operation == 1) {
             if(userIndex == -1) {
-                const classInfo = await ctx.state.collection.classes.findOne({ code: moveSeatInfo.classCode });
+                const classInfo = await ctx.state.collection.classrooms.findOne({ code: moveSeatInfo.classCode });
                 if(!classInfo || moveSeatInfo.secondary.length+2 > classInfo.moveseat.limit) ctx.throw(400);
                 const addUserInfo = await ctx.state.collection.users.findOne({ code: parseInt(ctx.request.body.userInfo, 10)});
                 if(!addUserInfo) ctx.throw(400);
