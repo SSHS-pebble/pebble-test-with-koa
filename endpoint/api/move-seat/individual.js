@@ -29,7 +29,7 @@ module.exports = {
     },
     common: async (ctx, next) => {
         if(!ctx.state.user) ctx.throw(400);
-        if(!isNumber(ctx.params.code) || ctx.params.code <= 0) ctx.throw(400);
+        if(!isNumber(ctx.params.code) || ctx.params.code < 1) ctx.throw(400);
         ctx.state.collection.moveSeatState = ctx.state.db.collection(`move-seat-individual-${ctx.params.code}`);
 
         const randomDoc = (await ctx.state.collection.moveSeatState.aggregate([{ $sample: { size: 1 } }]).toArray())[0];

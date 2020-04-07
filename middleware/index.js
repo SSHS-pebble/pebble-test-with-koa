@@ -10,6 +10,8 @@ module.exports = {
         ctx.state.collection.users = ctx.state.db.collection("users");
         ctx.state.collection.classes = ctx.state.db.collection("classes");
         ctx.state.collection.subjects = ctx.state.db.collection("subjects");
+        ctx.state.collection.department = ctx.state.db.collection("department");
+        ctx.state.collection.teachers = ctx.state.db.collection("teachers");
         await next();
     },
     withAuth: async (ctx, next) => {

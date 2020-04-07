@@ -4,7 +4,7 @@ const isNumber = require('is-number');
 
 module.exports = {
     post: async (ctx, next) => {
-        if(!isNumber(ctx.request.body.classCode) || ctx.request.body.classCode <= 0) ctx.throw(400);
+        if(!isNumber(ctx.request.body.classCode) || ctx.request.body.classCode < 1) ctx.throw(400);
         const classCode = parseInt(ctx.request.body.classCode, 10);
         const classInfo = await ctx.state.collection.classes.findOne({ code: classCode });
         if(!classInfo || !classInfo.moveseat.group[ctx.state.user.grade-1]) ctx.throw(400);
