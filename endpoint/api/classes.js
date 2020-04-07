@@ -32,16 +32,22 @@ module.exports = {
         }, { upsert: true });
         await next();
     },
-    get: async (ctx, next) => {
+    getOne: async(ctx, next) => {
+        if(!isNumber(ctx.request.params.code)) ctx.throw(400);
+        ctx.body.data = await ctx.state.collection.classes.findOne({ code: ctx.request.params.code });
+        await next();
+    },
+    getMany: async (ctx, next) => {
         ctx.body.data = await ctx.state.collection.classes.find().toArray();
         await next();
     },
-    delete: async (ctx, next) => {
-        if(!isNumber(ctx.request.body.code)) ctx.throw(400);
+    deleteOne: async (ctx, next) => {
+        if(!isNumber(ctx.request.params.code)) ctx.throw(400);
         await ctx.state.collection.classes.deleteOne({ code: ctx.request.params.code });
         await next();
     },
-    common: async (ctx, next) => {
+    deleteMany: async(ctx, next) => {
+        await ctx.state.collection.classes.deleteMany();
         await next();
     }
 }
