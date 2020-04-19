@@ -11,6 +11,9 @@ module.exports = {
         ctx.state.collection.classrooms = ctx.state.db.collection("classrooms");
         ctx.state.collection.subjects = ctx.state.db.collection("subjects");
         ctx.state.collection.teachers = ctx.state.db.collection("teachers");
+        ctx.state.collection.moveSeatIndividual = ctx.state.db.collection("move-seat-individual");
+        ctx.state.collection.moveSeatGroup = ctx.state.db.collection("move-seat-group");
+        
         await next();
     },
     withAuth: async (ctx, next) => {

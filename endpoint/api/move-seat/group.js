@@ -8,7 +8,7 @@ module.exports = {
         const classCode = parseInt(ctx.request.body.classCode, 10);
         const classInfo = await ctx.state.collection.classrooms.findOne({ code: classCode });
         if(!classInfo || !classInfo.moveseat.group[ctx.state.user.grade-1]) ctx.throw(400);
-        const count = await ctx.state.collection.moveSeatState.countDocuments({ classcode: classCode });
+        const count = await ctx.state.collection.moveSeatGroup.countDocuments({ classcode: classCode });
         
         if(!ctx.request.body.users || count >= 1) ctx.throw(400);
         if(ctx.state.user.moveSeatInfo && isSameDay(new ObjectId(ctx.state.user.moveSeatInfo).getTimestamp(), new Date())) ctx.throw(400);
@@ -28,10 +28,10 @@ module.exports = {
             })
         );
 
-        await ctx.state.collection.moveSeatState.findOneAndUpdate({ primary: ctx.state.user.code },
+        await ctx.state.collection.moveSeatGroup.findOneAndUpdate({ primary: ctx.state.user.code },
             { $setOnInsert: { classCode: classCode, secondary: userInfo.map(user => user.code) } }, { upsert: true }
         );
-        const insertDoc = await ctx.state.collection.moveSeatState.findOne({ primary: ctx.state.user.code });
+        const insertDoc = await ctx.state.collection.moveSeatGroup.findOne({ primary: ctx.state.user.code });
         await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: { moveSeatInfo: insertDoc._id } } );
         userInfo.forEach(async (user) => {
             await ctx.state.collection.users.findOneAndUpdate({ code: user.code }, { $set: { moveSeatInfo: insertDoc._id } } );
@@ -40,23 +40,24 @@ module.exports = {
         await next();
     },
     get: async (ctx, next) => {
-        ctx.body.data = await ctx.state.collection.moveSeatState.find().toArray();
+        ctx.body.data = await ctx.state.collection.moveSeatGroup.find().toArray();
         await next();
     },
     delete: async (ctx, next) => {
-        const moveSeatInfo = await ctx.state.collection.moveSeatState.findOne({ primary: ctx.state.user.code });
+        const moveSeatInfo = await ctx.state.collection.moveSeatGroup.findOne({ primary: ctx.state.user.code });
         if(!moveSeatInfo) ctx.throw(400);
         
         await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: { moveSeatInfo: undefined } });
         moveSeatInfo.secondary.forEach(async (user) => {
             await ctx.state.collection.users.findOneAndUpdate({ code: user }, { $set: { moveSeatInfo: undefined } });
         });
-        await ctx.state.collection.moveSeatState.deleteOne({ primary: ctx.state.user.code });
+        await ctx.state.collection.moveSeatGroup.deleteOne({ primary: ctx.state.user.code });
         await next();
     },
     put: async (ctx, next) => {
         if(!isNumber(ctx.request.body.userInfo) || !isNumber(ctx.request.body.operation)) ctx.throw(400);
-        const moveSeatInfo = await ctx.state.collection.moveSeatState.findOne({ primary: ctx.state.user.code });
+        if(ctx.request.body.userInfo < 1) ctx.throw(400);
+        const moveSeatInfo = await ctx.state.collection.moveSeatGroup.findOne({ primary: ctx.state.user.code });
         if(!moveSeatInfo) ctx.throw(400);
         const userIndex = moveSeatInfo.secondary.findIndex(code => (code == parseInt(ctx.request.body.userInfo, 10)));
         
@@ -78,23 +79,22 @@ module.exports = {
             }
         } else ctx.throw(400);
 
-        await ctx.state.collection.moveSeatState.findOneAndUpdate({ primary: ctx.state.user.code }, { $set: { secondary: moveSeatInfo.secondary } });
+        await ctx.state.collection.moveSeatGroup.findOneAndUpdate({ primary: ctx.state.user.code }, { $set: { secondary: moveSeatInfo.secondary } });
         await next();
     },
     common: async (ctx, next) => {
         if(!ctx.state.user) ctx.throw(400);
 
-        ctx.state.collection.moveSeatState = ctx.state.db.collection(`move-seat-group`);
-        const randomDoc = (await ctx.state.collection.moveSeatState.aggregate([{ $sample: { size: 1 } }]).toArray())[0];
+        const randomDoc = (await ctx.state.collection.moveSeatGroup.aggregate([{ $sample: { size: 1 } }]).toArray())[0];
         if(!randomDoc || !isSameDay(new ObjectId(randomDoc._id).getTimestamp(), new Date())) {
-            const allDoc = await ctx.state.collection.moveSeatState.find().toArray();
+            const allDoc = await ctx.state.collection.moveSeatGroup.find().toArray();
             allDoc.forEach(async (doc) => {
                 await ctx.state.collection.users.findOneAndUpdate({ code: doc.primary }, { $set: { moveSeatInfo: undefined } } );
                 doc.secondary.forEach(async (secondaryUser) => {
                     await ctx.state.collection.users.findOneAndUpdate({ code: secondaryUser }, { $set: { moveSeatInfo: undefined } } );
                 });
             });
-            await ctx.state.collection.moveSeatState.deleteMany();
+            await ctx.state.collection.moveSeatGroup.deleteMany();
         }
 
         await next();
