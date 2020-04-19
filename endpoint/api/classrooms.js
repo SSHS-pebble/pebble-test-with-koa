@@ -5,7 +5,7 @@ module.exports = {
         if(!ctx.request.body.name || !ctx.request.body.building || !ctx.request.body.individual || !ctx.request.body.group) ctx.throw(400);
         if(!isNumber(ctx.request.body.limit) || !isNumber(ctx.request.body.floor)) ctx.throw(400);
         if(ctx.request.body.limit < 1 || ctx.request.body.floor < 1) ctx.throw(400);
-        if(ctx.params.code > 99 || ctx.params.code%10 > 2) ctx.throw(400);
+        if(ctx.params.code > 9) ctx.throw(400);
 
         const individualArray = JSON.parse(ctx.request.body.individual);
         const groupArray = JSON.parse(ctx.request.body.group);

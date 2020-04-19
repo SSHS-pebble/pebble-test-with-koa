@@ -2,7 +2,7 @@ const isNumber = require('is-number');
 
 module.exports = {
     post: async (ctx, next) => {
-        if(!ctx.request.body.name) ctx.throw(400);
+        if(!ctx.request.body.name || ctx.params.code > 9) ctx.throw(400);
         if(!isNumber(ctx.request.body.office) || ctx.request.body.office < 1) ctx.throw(400);
         const isOfficeExist = await ctx.state.collection.classrooms.countDocuments({ code: parseInt(ctx.request.body.office, 10) });
         if(isOfficeExist == 0) ctx.throw(400);
