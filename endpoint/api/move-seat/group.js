@@ -33,9 +33,11 @@ module.exports = {
         );
         const insertDoc = await ctx.state.collection.moveSeatGroup.findOne({ primary: ctx.state.user.code });
         await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: { moveSeatInfo: insertDoc._id } } );
-        userInfo.forEach(async (user) => {
-            await ctx.state.collection.users.findOneAndUpdate({ code: user.code }, { $set: { moveSeatInfo: insertDoc._id } } );
-        });
+        await Promise.all(
+            userInfo.forEach(user => {
+                ctx.state.collection.users.findOneAndUpdate({ code: user.code }, { $set: { moveSeatInfo: insertDoc._id } } );
+            })
+        );
 
         await next();
     },
@@ -48,9 +50,11 @@ module.exports = {
         if(!moveSeatInfo) ctx.throw(400);
         
         await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: { moveSeatInfo: undefined } });
-        moveSeatInfo.secondary.forEach(async (user) => {
-            await ctx.state.collection.users.findOneAndUpdate({ code: user }, { $set: { moveSeatInfo: undefined } });
-        });
+        await Promise.all(
+            moveSeatInfo.secondary.forEach(user => {
+                ctx.state.collection.users.findOneAndUpdate({ code: user }, { $set: { moveSeatInfo: undefined } });
+            })
+        );
         await ctx.state.collection.moveSeatGroup.deleteOne({ primary: ctx.state.user.code });
         await next();
     },
@@ -88,12 +92,16 @@ module.exports = {
         const randomDoc = (await ctx.state.collection.moveSeatGroup.aggregate([{ $sample: { size: 1 } }]).toArray())[0];
         if(!randomDoc || !isSameDay(new ObjectId(randomDoc._id).getTimestamp(), new Date())) {
             const allDoc = await ctx.state.collection.moveSeatGroup.find().toArray();
-            allDoc.forEach(async (doc) => {
-                await ctx.state.collection.users.findOneAndUpdate({ code: doc.primary }, { $set: { moveSeatInfo: undefined } } );
-                doc.secondary.forEach(async (secondaryUser) => {
-                    await ctx.state.collection.users.findOneAndUpdate({ code: secondaryUser }, { $set: { moveSeatInfo: undefined } } );
-                });
+            var initUsersArray = [];
+            allDoc.forEach(doc => {
+                initUsersArray.push(doc.primary);
+                initUsersArray = initUsersArray.concat(doc.secondary);
             });
+            await Promise.all( 
+                initUsersArray.forEach(userInfo => {
+                    ctx.state.collection.users.findOneAndUpdate({ code: userInfo }, { $set: { moveSeatInfo: undefined } } );
+                })
+            );
             await ctx.state.collection.moveSeatGroup.deleteMany();
         }
 

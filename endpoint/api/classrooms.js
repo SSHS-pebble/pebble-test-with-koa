@@ -2,17 +2,8 @@ const isNumber = require('is-number');
 
 module.exports = {
     post: async (ctx, next) => {
-        if(!ctx.request.body.name || !ctx.request.body.building || !ctx.request.body.individual || !ctx.request.body.group) ctx.throw(400);
-        if(!isNumber(ctx.request.body.limit) || !isNumber(ctx.request.body.floor)) ctx.throw(400);
-        if(ctx.request.body.limit < 1 || ctx.request.body.floor < 1) ctx.throw(400);
-        if(ctx.params.code > 9) ctx.throw(400);
-
-        const individualArray = JSON.parse(ctx.request.body.individual);
-        const groupArray = JSON.parse(ctx.request.body.group);
-        if(!Array.isArray(individualArray) || !Array.isArray(groupArray)) ctx.throw(400);
-        individualArray.forEach(allow => { if(allow != 0 && allow != 1) ctx.throw(400); })
-        groupArray.forEach(allow => { if(allow != 0 && allow != 1) ctx.throw(400); })
-        
+        if(!ctx.request.body.name || !ctx.request.body.building) ctx.throw(400);
+        if(!isNumber(ctx.request.body.floor) || ctx.request.body.floor < 1 || ctx.params.code > 9) ctx.throw(400);
         const departmentCode = parseInt(ctx.params.code, 10);
         const classrooms = await ctx.state.collection.classrooms.find({ code: { $gte: departmentCode*100, $lt: (departmentCode+1)*100 } }).toArray();
         var classroomCode = undefined;
@@ -28,8 +19,8 @@ module.exports = {
                 floor: parseInt(ctx.request.body.floor, 10),
                 moveseat: {
                     limit: parseInt(ctx.request.body.limit, 10),
-                    individual: individualArray,
-                    group: groupArray
+                    individual: ctx.state.array.individual,
+                    group: ctx.state.array.group
                 }
             }
         }, { upsert: true });
@@ -45,24 +36,28 @@ module.exports = {
         await next();
     },
     patch: async(ctx, next) => {
-        if(!isNumber(ctx.request.body.limit)) ctx.throw(400);
-        const individualArray = JSON.parse(ctx.request.body.individual);
-        const groupArray = JSON.parse(ctx.request.body.group);
-        if(!Array.isArray(individualArray) || !Array.isArray(groupArray)) ctx.throw(400);
-        individualArray.forEach(allow => { if(allow != 0 && allow != 1) ctx.throw(400); })
-        groupArray.forEach(allow => { if(allow != 0 && allow != 1) ctx.throw(400); })
-
         await ctx.state.collection.teachers.findOneAndUpdate({ code: parseInt(ctx.params.code, 10) }, { $set: {
             moveseat: {
                 limit: parseInt(ctx.request.body.limit, 10),
-                individual: individualArray,
-                group: groupArray
+                individual: ctx.state.array.individual,
+                group: ctx.state.array.group
             }
         }});
         await next();
     },
     common: async (ctx, next) => {
         if(!isNumber(ctx.params.code) || ctx.params.code < 0) ctx.throw(400);
+
+        if(ctx.method == "POST" || ctx.method == "PATCH") {
+            if(!isNumber(ctx.request.body.limit) || ctx.request.body.limit < 1) ctx.throw(400);
+            if(!ctx.request.body.individual || !ctx.request.body.group) ctx.throw(400);
+            ctx.state.array.individual = JSON.parse(ctx.request.body.individual);
+            ctx.state.array.group = JSON.parse(ctx.request.body.group);
+            if(!Array.isArray(ctx.state.array.individual) || !Array.isArray(ctx.state.array.group)) ctx.throw(400);
+            ctx.state.array.individual.forEach(allow => { if(allow != 0 && allow != 1) ctx.throw(400); })
+            ctx.state.array.group.forEach(allow => { if(allow != 0 && allow != 1) ctx.throw(400); })
+        }
+
         await next();
     }
 }

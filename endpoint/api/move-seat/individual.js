@@ -34,9 +34,11 @@ module.exports = {
         const randomDoc = (await ctx.state.collection.moveSeatIndividual.aggregate([{ $sample: { size: 1 } }]).toArray())[0];
         if(!randomDoc || !isSameDay(new ObjectId(randomDoc._id).getTimestamp(), new Date())) {
             const allDoc = await ctx.state.collection.moveSeatIndividual.find().toArray();
-            allDoc.forEach(async (doc) => {
-                await ctx.state.collection.users.findOneAndUpdate({ code: doc.code }, { $set: { moveSeatInfo: undefined } } );
-            });
+            await Promise.all(
+                allDoc.forEach(doc => {
+                    ctx.state.collection.users.findOneAndUpdate({ code: doc.code }, { $set: { moveSeatInfo: undefined } } );
+                })
+            );
             await ctx.state.collection.moveSeatIndividual.deleteMany();
         }
 

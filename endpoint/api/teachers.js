@@ -3,10 +3,6 @@ const isNumber = require('is-number');
 module.exports = {
     post: async (ctx, next) => {
         if(!ctx.request.body.name || ctx.params.code > 9) ctx.throw(400);
-        if(!isNumber(ctx.request.body.office) || ctx.request.body.office < 1) ctx.throw(400);
-        const isOfficeExist = await ctx.state.collection.classrooms.countDocuments({ code: parseInt(ctx.request.body.office, 10) });
-        if(isOfficeExist == 0) ctx.throw(400);
-
         const departmentCode = parseInt(ctx.params.code, 10);
         const teachers = await ctx.state.collection.teachers.find({ code: { $gte: departmentCode*1000, $lt: (departmentCode+1)*1000 } }).toArray();
         var teacherCode = undefined;
@@ -33,15 +29,16 @@ module.exports = {
         await next();
     },
     patch: async (ctx, next) => {
-        if(!isNumber(ctx.request.body.office) || ctx.request.body.office < 1) ctx.throw(400);
-        const isOfficeExist = await ctx.state.collection.classrooms.countDocuments({ code: parseInt(ctx.request.body.office, 10) });
-        if(isOfficeExist == 0) ctx.throw(400);
-
         await ctx.state.collection.teachers.findOneAndUpdate({ code: parseInt(ctx.params.code, 10) }, { $set: { office: parseInt(ctx.request.body.office, 10) } });
         await next();
     },
     common: async (ctx, next) => {
         if(!isNumber(ctx.params.code) || ctx.params.code < 0) ctx.throw(400);
+        if(ctx.method == "POST" || ctx.method == "PATCH") {
+            if(!isNumber(ctx.request.body.office) || ctx.request.body.office < 1) ctx.throw(400);
+            const isOfficeExist = await ctx.state.collection.classrooms.countDocuments({ code: parseInt(ctx.request.body.office, 10) });
+            if(isOfficeExist == 0) ctx.throw(400);
+        }
         await next();
     }
 }
