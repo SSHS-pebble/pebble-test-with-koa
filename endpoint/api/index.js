@@ -5,11 +5,11 @@ const subjects = require('./subjects');
 const teachers = require('./teachers');
 const api = new Router();
 
-api.use("/classrooms/:code", classrooms.common).get("/classrooms/:code", classrooms.get).post("/classrooms/:code", classrooms.post).delete("/classrooms/:code", classrooms.delete).put("/classrooms/:code", classrooms.put);
+api.use("/classrooms/:code", classrooms.common).get("/classrooms/:code", classrooms.get).post("/classrooms/:code", classrooms.post).delete("/classrooms/:code", classrooms.delete).patch("/classrooms/:code", classrooms.patch);
 
-api.use("/teachers/:code", teachers.common).get("/teachers/:code", teachers.get).post("/teachers/:code", teachers.post).delete("/teachers/:code", teachers.delete).put("/teachers/:code", teachers.put);
+api.use("/teachers/:code", teachers.common).get("/teachers/:code", teachers.get).post("/teachers/:code", teachers.post).delete("/teachers/:code", teachers.delete).patch("/teachers/:code", teachers.patch);
 
-api.use("/subjects/:code", subjects.common).get("/subjects/:code", subjects.get).post("/subjects/:code", subjects.post).delete("/subjects/:code", subjects.delete).put("/subjects/:code", subjects.put);
+api.use("/subjects/:code", subjects.common).get("/subjects/:code", subjects.get).post("/subjects/:code", subjects.post).delete("/subjects/:code", subjects.delete).patch("/subjects/:code", subjects.patch);
 
 api.use("/move-seat", moveseat.routes(), moveseat.allowedMethods());
 

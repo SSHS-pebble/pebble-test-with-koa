@@ -32,7 +32,7 @@ module.exports = {
         await ctx.state.collection.teachers.deleteOne({ code: parseInt(ctx.params.code, 10) });
         await next();
     },
-    put: async (ctx, next) => {
+    patch: async (ctx, next) => {
         if(!isNumber(ctx.request.body.office) || ctx.request.body.office < 1) ctx.throw(400);
         const isOfficeExist = await ctx.state.collection.classrooms.countDocuments({ code: parseInt(ctx.request.body.office, 10) });
         if(isOfficeExist == 0) ctx.throw(400);

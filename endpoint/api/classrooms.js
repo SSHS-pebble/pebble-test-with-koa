@@ -44,7 +44,7 @@ module.exports = {
         await ctx.state.collection.classrooms.deleteOne({ code: parseInt(ctx.params.code, 10) });
         await next();
     },
-    put: async(ctx, next) => {
+    patch: async(ctx, next) => {
         if(!isNumber(ctx.request.body.limit)) ctx.throw(400);
         const individualArray = JSON.parse(ctx.request.body.individual);
         const groupArray = JSON.parse(ctx.request.body.group);

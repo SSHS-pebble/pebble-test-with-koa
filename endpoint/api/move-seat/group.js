@@ -54,7 +54,7 @@ module.exports = {
         await ctx.state.collection.moveSeatGroup.deleteOne({ primary: ctx.state.user.code });
         await next();
     },
-    put: async (ctx, next) => {
+    patch: async (ctx, next) => {
         if(!isNumber(ctx.request.body.userInfo) || !isNumber(ctx.request.body.operation)) ctx.throw(400);
         if(ctx.request.body.userInfo < 1) ctx.throw(400);
         const moveSeatInfo = await ctx.state.collection.moveSeatGroup.findOne({ primary: ctx.state.user.code });

@@ -39,7 +39,7 @@ module.exports = {
         if(!isNumber(subjectCode)) ctx.throw(500);
         subjectCode += departmentCode*100;
 
-        await ctx.state.collection.classrooms.findOneAndUpdate({ code: subjectCode }, {
+        await ctx.state.collection.subjects.findOneAndUpdate({ code: subjectCode }, {
             $setOnInsert: {
                 name: ctx.request.body.name,
                 credit: parseInt(ctx.request.body.credit, 10),
@@ -50,12 +50,16 @@ module.exports = {
         await next();
     },
     get: async (ctx, next) => {
+        if(ctx.params.code == 0) ctx.body.data = await ctx.state.collection.subjects.find().toArray();
+        else ctx.body.data = await ctx.state.collection.subjects.findOne({ code: parseInt(ctx.params.code, 10) });
         await next();
     },
     delete: async (ctx, next) => {
+        await ctx.state.collection.subjects.deleteOne({ code: parseInt(ctx.params.code, 10) });
         await next();
     },
-    put: async (ctx, next) => {
+    patch: async (ctx, next) => {
+
         await next();
     },
     common: async (ctx, next) => {
