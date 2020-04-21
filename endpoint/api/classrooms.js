@@ -7,11 +7,10 @@ module.exports = {
         const departmentCode = parseInt(ctx.params.code, 10);
         const classrooms = await ctx.state.collection.classrooms.find({ code: { $gte: departmentCode*100, $lt: (departmentCode+1)*100 } }).toArray();
         var classroomCode = undefined;
-        if(classrooms.length == 0) classroomCode = 1;
+        if(classrooms.length == 0) classroomCode = departmentCode*100+1;
         else classroomCode = classrooms.map(classInfo => classInfo.code).sort((a, b) => b - a)[0]+1;
         if(!isNumber(classroomCode)) ctx.throw(500);
-        classroomCode += departmentCode*100;
-
+        
         await ctx.state.collection.classrooms.findOneAndUpdate({ code: classroomCode }, {
             $setOnInsert: {
                 name: ctx.request.body.name,
@@ -36,7 +35,7 @@ module.exports = {
         await next();
     },
     patch: async(ctx, next) => {
-        await ctx.state.collection.teachers.findOneAndUpdate({ code: parseInt(ctx.params.code, 10) }, { $set: {
+        await ctx.state.collection.classrooms.findOneAndUpdate({ code: parseInt(ctx.params.code, 10) }, { $set: {
             moveseat: {
                 limit: parseInt(ctx.request.body.limit, 10),
                 individual: ctx.state.array.individual,
@@ -51,9 +50,11 @@ module.exports = {
         if(ctx.method == "POST" || ctx.method == "PATCH") {
             if(!isNumber(ctx.request.body.limit) || ctx.request.body.limit < 1) ctx.throw(400);
             if(!ctx.request.body.individual || !ctx.request.body.group) ctx.throw(400);
+            ctx.state.array = {};
             ctx.state.array.individual = JSON.parse(ctx.request.body.individual);
             ctx.state.array.group = JSON.parse(ctx.request.body.group);
-            if(!Array.isArray(ctx.state.array.individual) || !Array.isArray(ctx.state.array.group)) ctx.throw(400);
+            if(!Array.isArray(ctx.state.array.individual) || ctx.state.array.individual.length != 3) ctx.throw(400);
+            if(!Array.isArray(ctx.state.array.group) || ctx.state.array.group.length != 3) ctx.throw(400);
             ctx.state.array.individual.forEach(allow => { if(allow != 0 && allow != 1) ctx.throw(400); })
             ctx.state.array.group.forEach(allow => { if(allow != 0 && allow != 1) ctx.throw(400); })
         }

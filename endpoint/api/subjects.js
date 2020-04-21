@@ -8,10 +8,9 @@ module.exports = {
         const departmentCode = parseInt(ctx.params.code, 10);
         const subjects = await ctx.state.collection.subjects.find({ code: { $gte: departmentCode*100, $lt: (departmentCode+1)*100 } }).toArray();
         var subjectCode = undefined;
-        if(subjects.length == 0) subjectCode = 1;
+        if(subjects.length == 0) subjectCode = departmentCode*100+1;
         else subjectCode = subjects.map(subjectInfo => subjectInfo.code).sort((a, b) => b - a)[0]+1;
         if(!isNumber(subjectCode)) ctx.throw(500);
-        subjectCode += departmentCode*100;
 
         await ctx.state.collection.subjects.findOneAndUpdate({ code: subjectCode }, {
             $setOnInsert: {
@@ -66,7 +65,7 @@ module.exports = {
                 teachersArray.map(teacherInfo => {
                     return ctx.state.collection.teachers.countDocuments({ code: teacherInfo });
                 })
-            ).forEach(isExist => { if(isExist == 0) ctx.throw(400); } );
+            ).forEach(isExist => { console.log(isExist); if(isExist == 0) ctx.throw(400); } );
             await Promise.all(
                 classroomsArray.map(classroomInfo => {
                     return ctx.state.collection.classrooms.countDocuments({ code: classroomInfo });

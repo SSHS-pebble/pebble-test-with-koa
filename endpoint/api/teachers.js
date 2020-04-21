@@ -6,10 +6,9 @@ module.exports = {
         const departmentCode = parseInt(ctx.params.code, 10);
         const teachers = await ctx.state.collection.teachers.find({ code: { $gte: departmentCode*1000, $lt: (departmentCode+1)*1000 } }).toArray();
         var teacherCode = undefined;
-        if(teachers.length == 0) teacherCode = 1;
+        if(teachers.length == 0) teacherCode = departmentCode*1000+1;
         else teacherCode = teachers.map(teacherInfo => teacherInfo.code).sort((a, b) => b - a)[0]+1;
         if(!isNumber(teacherCode)) ctx.throw(500);
-        teacherCode += departmentCode*1000;
         
         await ctx.state.collection.teachers.findOneAndUpdate({ code: teacherCode }, {
             $setOnInsert: {
