@@ -15,7 +15,7 @@ module.exports = {
                 name: ctx.request.body.name,
                 office: parseInt(ctx.request.body.office, 10)
             }
-        });
+        }, { upsert: true });
         await next();
     },
     get: async (ctx, next) => {

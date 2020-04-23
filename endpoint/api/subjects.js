@@ -42,22 +42,18 @@ module.exports = {
             if(!ctx.request.body.classes) ctx.throw(400);
             ctx.state.array.classes = JSON.parse(ctx.request.body.classes);
             if(!Array.isArray(ctx.state.array.classes)) ctx.throw(400);
-            var teachersArray = [];
-            var classroomsArray = [];
+            var teachersArray = new Set();
+            var classroomsArray = new Set();
             ctx.state.array.classes.forEach(classInfo => {
                 if(!Array.isArray(classInfo)) ctx.throw(400);
                 if(classInfo.length != ctx.request.body.hours) ctx.throw(400);
                 classInfo.forEach(timeInfo => {
                     if(!Array.isArray(timeInfo.teacher)) ctx.throw(400);
                     if(!isNumber(timeInfo.classroom)) ctx.throw(400);
-                    if(!classroomsArray.includes(parseInt(timeInfo.classroom, 10))) {
-                        classroomsArray.push(parseInt(timeInfo.classroom, 10));
-                    }
+                    classroomsArray.add(parseInt(timeInfo.classroom, 10));
                     timeInfo.teacher.forEach(teacherInfo => {
                         if(!isNumber(teacherInfo)) ctx.throw(400);
-                        if(!teachersArray.includes(parseInt(teacherInfo, 10))) {
-                            teachersArray.push(parseInt(teacherInfo, 10));
-                        }
+                        teachersArray.add(parseInt(teacherInfo, 10));
                     });
                 });
             });
