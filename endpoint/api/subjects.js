@@ -3,7 +3,7 @@ const isNumber = require('is-number');
 module.exports = {
     post: async (ctx, next) => {
         if(!ctx.request.body.name || ctx.params.code > 9) ctx.throw(400);
-        if(!isNumber(ctx.request.body.hours) || !isNumber(ctx.request.body.credit)) ctx.throw(400);
+        if(!isNumber(ctx.request.body.credit)) ctx.throw(400);
 
         const departmentCode = parseInt(ctx.params.code, 10);
         const subjects = await ctx.state.collection.subjects.find({ code: { $gte: departmentCode*100, $lt: (departmentCode+1)*100 } }).toArray();
@@ -32,41 +32,46 @@ module.exports = {
         await next();
     },
     patch: async (ctx, next) => {
-        await ctx.state.collection.subjects.findOneAndUpdate({ code: parseInt(ctx.params.code, 10) }, { $set: { classes: ctx.state.array.classes } });
+        await ctx.state.collection.subjects.findOneAndUpdate({ code: parseInt(ctx.params.code, 10) }, {
+            $set: {
+                hours: parseInt(ctx.request.body.hours, 10),
+                classes: ctx.state.array.classes
+            }
+        });
         await next();
     },
     common: async (ctx, next) => {
         if(!isNumber(ctx.params.code) || ctx.params.code < 0) ctx.throw(400);
 
         if(ctx.method == "POST" || ctx.method == "PATCH") {
-            if(!ctx.request.body.classes) ctx.throw(400);
+            if(!isNumber(ctx.request.body.hours) || !ctx.request.body.classes) ctx.throw(400);
+            ctx.state.array = {};
             ctx.state.array.classes = JSON.parse(ctx.request.body.classes);
             if(!Array.isArray(ctx.state.array.classes)) ctx.throw(400);
-            var teachersArray = new Set();
-            var classroomsArray = new Set();
+            var teachersSet = new Set();
+            var classroomsSet = new Set();
             ctx.state.array.classes.forEach(classInfo => {
                 if(!Array.isArray(classInfo)) ctx.throw(400);
                 if(classInfo.length != ctx.request.body.hours) ctx.throw(400);
                 classInfo.forEach(timeInfo => {
                     if(!Array.isArray(timeInfo.teacher)) ctx.throw(400);
                     if(!isNumber(timeInfo.classroom)) ctx.throw(400);
-                    classroomsArray.add(parseInt(timeInfo.classroom, 10));
+                    classroomsSet.add(parseInt(timeInfo.classroom, 10));
                     timeInfo.teacher.forEach(teacherInfo => {
                         if(!isNumber(teacherInfo)) ctx.throw(400);
-                        teachersArray.add(parseInt(teacherInfo, 10));
+                        teachersSet.add(parseInt(teacherInfo, 10));
                     });
                 });
             });
-            await Promise.all(
-                teachersArray.map(teacherInfo => {
+            const [teachersExist, classroomsExist] = await Promise.all([
+                Promise.all(Array.from(teachersSet).map(teacherInfo => {
                     return ctx.state.collection.teachers.countDocuments({ code: teacherInfo });
-                })
-            ).forEach(isExist => { console.log(isExist); if(isExist == 0) ctx.throw(400); } );
-            await Promise.all(
-                classroomsArray.map(classroomInfo => {
+                })),
+                Promise.all(Array.from(classroomsSet).map(classroomInfo => {
                     return ctx.state.collection.classrooms.countDocuments({ code: classroomInfo });
-                })
-            ).forEach(isExist => { if(isExist == 0) ctx.throw(400); } );
+                }))
+            ]);
+            if(teachersExist.includes(0) || classroomsExist.includes(0)) ctx.throw(400);
         }
         
         await next();
