@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { isSameDay } = require("date-fns");
+const isSameDay = require("date-fns/isSameDay");
 const isNumber = require('is-number');
 
 module.exports = {
@@ -28,14 +28,12 @@ module.exports = {
             })
         );
 
-        await ctx.state.collection.moveSeatGroup.findOneAndUpdate({ primary: ctx.state.user.code },
-            { $setOnInsert: { classCode: classCode, secondary: userInfo.map(user => user.code) } }, { upsert: true }
-        );
-        const insertDoc = await ctx.state.collection.moveSeatGroup.findOne({ primary: ctx.state.user.code });
-        await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: { moveSeatInfo: insertDoc._id } } );
+        const insertDoc = await ctx.state.collection.moveSeatGroup.findOneAndUpdate({ primary: ctx.state.user.code }, { $setOnInsert: { classCode: classCode, secondary: userInfo.map(user => user.code) } }, { upsert: true, returnOriginal: false } );
+        if(insertDoc.ok != 1) ctx.throw(400);
+        await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: { moveSeatInfo: insertDoc.value._id } } );
         await Promise.all(
             userInfo.forEach(user => {
-                ctx.state.collection.users.findOneAndUpdate({ code: user.code }, { $set: { moveSeatInfo: insertDoc._id } } );
+                ctx.state.collection.users.findOneAndUpdate({ code: user.code }, { $set: { moveSeatInfo: insertDoc.value._id } } );
             })
         );
 
