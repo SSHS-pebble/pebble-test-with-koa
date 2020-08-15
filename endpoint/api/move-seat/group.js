@@ -11,29 +11,34 @@ module.exports = {
         const count = await ctx.state.collection.moveSeatGroup.countDocuments({ classcode: classCode });
         
         if(!ctx.request.body.users || count >= 1) ctx.throw(400);
-        if(ctx.state.user.moveSeatInfo && isSameDay(new ObjectId(ctx.state.user.moveSeatInfo).getTimestamp(), new Date())) ctx.throw(400);
+        if(ctx.state.user.moveSeatInfo && isSameDay(new ObjectId(ctx.state.user.moveSeatInfo.id).getTimestamp(), new Date())) ctx.throw(400);
 
         const usersArray = JSON.parse(ctx.request.body.users);
         if(!Array.isArray(usersArray)) ctx.throw(400);
         if(usersArray.length == 0 || usersArray.length+1 > classInfo.moveseat.limit) ctx.throw(400);
 
         const userInfo = await Promise.all(
-            usersArray.map(async (user) => {
+            usersArray.map(user => {
                 if(!isNumber(user)) ctx.throw(400);
-                const ithuser = await ctx.state.collection.users.findOne({ code: user });
-                if(!ithuser) ctx.throw(403);
-                if(!classInfo.moveseat.group[ithuser.grade-1]) ctx.throw(400);
-                if(ithuser.moveSeatInfo && isSameDay(new ObjectId(ithuser.moveSeatInfo).getTimestamp(), new Date())) ctx.throw(400);
-                return ithuser;
+                return ctx.state.collection.users.findOne({ code: user });
             })
         );
+        userInfo.forEach(user => {
+            if(!user || !classInfo.moveseat.group[user.grade-1]) ctx.throw(400);
+            if(user.moveSeatInfo && isSameDay(new ObjectId(user.moveSeatInfo).getTimestamp(), new Date())) ctx.throw(400);
+        });
 
         const insertDoc = await ctx.state.collection.moveSeatGroup.findOneAndUpdate({ primary: ctx.state.user.code }, { $setOnInsert: { classCode: classCode, secondary: userInfo.map(user => user.code) } }, { upsert: true, returnOriginal: false } );
         if(insertDoc.ok != 1) ctx.throw(400);
-        await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: { moveSeatInfo: insertDoc.value._id } } );
+        userInfo.push(ctx.state.user);
         await Promise.all(
-            userInfo.forEach(user => {
-                ctx.state.collection.users.findOneAndUpdate({ code: user.code }, { $set: { moveSeatInfo: insertDoc.value._id } } );
+            userInfo.map(user => {
+                return ctx.state.collection.users.findOneAndUpdate({ code: user.code }, { $set: {
+                    moveSeatInfo: {
+                        id: insertDoc.value._id,
+                        type: 1
+                    }
+                }});
             })
         );
 
@@ -49,8 +54,8 @@ module.exports = {
         
         await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: { moveSeatInfo: undefined } });
         await Promise.all(
-            moveSeatInfo.secondary.forEach(user => {
-                ctx.state.collection.users.findOneAndUpdate({ code: user }, { $set: { moveSeatInfo: undefined } });
+            moveSeatInfo.secondary.map(user => {
+                return ctx.state.collection.users.findOneAndUpdate({ code: user }, { $set: { moveSeatInfo: undefined } });
             })
         );
         await ctx.state.collection.moveSeatGroup.deleteOne({ primary: ctx.state.user.code });
@@ -77,7 +82,12 @@ module.exports = {
                 if(!classInfo.moveseat.group[addUserInfo.grade-1]) ctx.throw(400);
                 if(addUserInfo.moveSeatInfo && isSameDay(new ObjectId(addUserInfo.moveSeatInfo).getTimestamp(), new Date())) ctx.throw(400);
                 moveSeatInfo.secondary.push(addUserInfo.code);
-                await ctx.state.collection.users.findOneAndUpdate({ code: addUserInfo.code }, { $set: { moveSeatInfo: moveSeatInfo._id } } );
+                await ctx.state.collection.users.findOneAndUpdate({ code: addUserInfo.code }, { $set: { 
+                    moveSeatInfo: {
+                        id: insertDoc.value._id,
+                        type: 1
+                    }
+                }});
             }
         } else ctx.throw(400);
 
@@ -85,19 +95,20 @@ module.exports = {
         await next();
     },
     common: async (ctx, next) => {
+        ctx.state.user = await ctx.state.collection.users.findOne({ code: 10 });
         if(!ctx.state.user) ctx.throw(400);
 
         const randomDoc = (await ctx.state.collection.moveSeatGroup.aggregate([{ $sample: { size: 1 } }]).toArray())[0];
         if(!randomDoc || !isSameDay(new ObjectId(randomDoc._id).getTimestamp(), new Date())) {
             const allDoc = await ctx.state.collection.moveSeatGroup.find().toArray();
-            var initUsersArray = [];
-            allDoc.forEach(doc => {
-                initUsersArray.push(doc.primary);
-                initUsersArray = initUsersArray.concat(doc.secondary);
-            });
+            const initUsersArray = allDoc.reduce((acc, cur) => {
+                acc.push(cur.primary);
+                acc.push.apply(acc, cur.secondary);
+                return acc;
+            }, []);
             await Promise.all( 
-                initUsersArray.forEach(userInfo => {
-                    ctx.state.collection.users.findOneAndUpdate({ code: userInfo }, { $set: { moveSeatInfo: undefined } } );
+                initUsersArray.map(userInfo => {
+                    return ctx.state.collection.users.findOneAndUpdate({ code: userInfo }, { $set: { moveSeatInfo: undefined } } );
                 })
             );
             await ctx.state.collection.moveSeatGroup.deleteMany();

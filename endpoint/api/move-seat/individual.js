@@ -9,11 +9,16 @@ module.exports = {
         if(!classroom) ctx.throw(400);
         const count = await ctx.state.collection.moveSeatIndividual.countDocuments({ classCode: parseInt(ctx.request.body.classCode, 10) });
         if(count >= classroom.moveseat.limit) ctx.throw(400);
-        if(ctx.state.user.moveSeatInfo && isSameDay(new ObjectId(ctx.state.user.moveSeatInfo).getTimestamp(), new Date())) ctx.throw(400);
+        if(ctx.state.user.moveSeatInfo && isSameDay(new ObjectId(ctx.state.user.moveSeatInfo.id).getTimestamp(), new Date())) ctx.throw(400);
         if(!classroom.moveseat.individual[ctx.state.user.grade-1]) ctx.throw(400);
         const insertDoc = await ctx.state.collection.moveSeatIndividual.findOneAndUpdate({ studentCode: ctx.state.user.code }, { $setOnInsert: { classCode: parseInt(ctx.request.body.classCode, 10) } }, { upsert: true, returnOriginal: false });
         if(insertDoc.ok != 1) ctx.throw(400);
-        await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: { moveSeatInfo: insertDoc.value._id }});
+        await ctx.state.collection.users.findOneAndUpdate({ code: ctx.state.user.code }, { $set: {
+            moveSeatInfo: {
+                id: insertDoc.value._id,
+                type: 0
+            }
+        }});
         await next();
     },
     get: async (ctx, next) => {
